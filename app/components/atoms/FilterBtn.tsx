@@ -9,7 +9,7 @@ const FilterBtn = ({
   showTopics: boolean;
 }) => {
   return (
-    <button className={'w-[6%] flex align-end justify-end'} onClick={() => setShowTopics(!showTopics)}>
+    <button className={'min-w-[6%] flex align-end justify-end'} onClick={() => setShowTopics(!showTopics)}>
       {showTopics ? <FaFilterCircleXmark size={28}/> : <FaFilter  size={20}/>}
     </button>
   );

@@ -1,6 +1,6 @@
 const Logo = () => {
   return (
-    <p>Jotted <sup className={'text-dark_pink'}>by Christine</sup></p>
+    <p className={'w-full text-center font-bold'}>Jotted <sup className={'text-dark_pink font-normal'}>by Christine</sup></p>
   )
 }
 

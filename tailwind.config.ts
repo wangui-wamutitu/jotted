@@ -21,7 +21,7 @@ export default {
         dark_pink: '#B5179E',
         primary_purple: '#7209B7',
         dark_purple: '#560BAD',
-        darker_purple: '#480CA8',
+        darker_purple: '#390099',
         primary_blue: '#4CC9F0',
         dark_blue: '#4895EF'
       }

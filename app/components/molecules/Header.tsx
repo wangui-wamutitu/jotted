@@ -5,7 +5,7 @@ export const Header = () => {
   return (
     <header
       className={
-        "flex justify-between items-center pb-[1rem] border-b border-b-dark_pink"
+        "w-full flex justify-between items-center pb-[2rem]"
       }
     >
       <Logo />

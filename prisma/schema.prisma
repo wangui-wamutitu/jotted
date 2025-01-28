@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Blog {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  title     String    @db.VarChar(255)
+  excerpt   String
+  content   String
+  thumbnail String?
+  topicId   Int
+  likes     Int       @default(0)
+  topic     Topic     @relation(fields: [topicId], references: [id])
+  comments  Comment[]
+
+  @@index([topicId])  // Index for faster filtering by topic
+  @@index([likes])    // Todo: Index for sorting by likes 
+}
+
+model Topic {
+  id    Int    @id @default(autoincrement())
+  name  String @unique 
+  blogs Blog[]
+}
+
+model Comment {
+  id      Int       @id @default(autoincrement())
+  blogId  Int       // Foreign key to Blog
+  comment String
+  likes   Int       @default(0)  // Default value for likes
+  userId  Int       // Foreign key to User
+  blog    Blog      @relation(fields: [blogId], references: [id])
+  user    User      @relation(fields: [userId], references: [id])
+  replies Reply[]
+}
+
+model Reply {
+  id        Int       @id @default(autoincrement())
+  commentId Int       // Foreign key to Comment
+  reply     String
+  likes     Int       @default(0) // Default value for likes
+  comment   Comment   @relation(fields: [commentId], references: [id])
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  name     String
+  comments Comment[] // Updated to match naming conventions (plural)
+}

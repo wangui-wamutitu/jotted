@@ -6,7 +6,7 @@ const Search = () => {
   return (
     <input
       type="text"
-      className={"w-[90%] px-2 py-3 text-sm border border-dark_pink rounded-md bg-transparent"}
+      className={"w-[92%] mr-2 md:w-[94] md:mr-0 px-2 py-3 text-sm border border-dark_pink rounded-md bg-transparent"}
       placeholder="Search..."
       value={searchText}
       onChange={(e) => setSearchText(e.target.value)}
