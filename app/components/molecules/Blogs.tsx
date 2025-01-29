@@ -5,7 +5,7 @@ const Blogs = ({blogs}: {blogs: IBlog[]}) => {
   return (
     <div>
       {blogs.map((blog) => (
-        <Blog blog={blog} />
+        <Blog blog={blog} key={blog?.id} />
       ))}
     </div>
   );
