@@ -11,9 +11,9 @@ model Blog {
   id        Int       @id @default(autoincrement())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  title     String    @db.VarChar(255)
+  title     String    @db.VarChar(255) 
   excerpt   String
-  content   String
+  content   String    @unique
   thumbnail String?
   topicId   Int
   likes     Int       @default(0)
@@ -31,22 +31,19 @@ model Topic {
 }
 
 model Comment {
-  id      Int       @id @default(autoincrement())
-  blogId  Int       // Foreign key to Blog
-  comment String
-  likes   Int       @default(0)  // Default value for likes
-  userId  Int       // Foreign key to User
-  blog    Blog      @relation(fields: [blogId], references: [id])
-  user    User      @relation(fields: [userId], references: [id])
-  replies Reply[]
-}
-
-model Reply {
   id        Int       @id @default(autoincrement())
-  commentId Int       // Foreign key to Comment
-  reply     String
-  likes     Int       @default(0) // Default value for likes
-  comment   Comment   @relation(fields: [commentId], references: [id])
+  blogId    Int       // Foreign key to Blog
+  comment   String
+  likes     Int       @default(0)  // Default value for likes
+  userId    Int       // Foreign key to User
+  parentId  Int?      // Nullable, indicates if this comment is a reply to another comment
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt @default(now())
+
+  blog      Blog      @relation(fields: [blogId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
 }
 
 model User {

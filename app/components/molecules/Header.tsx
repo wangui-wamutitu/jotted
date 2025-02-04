@@ -3,13 +3,15 @@ import Mode from "../atoms/Mode";
 
 export const Header = () => {
   return (
-    <header
-      className={
-        "w-full flex justify-between items-center pb-[2rem]"
-      }
-    >
-      <Logo />
-      <Mode />
+    <header className={"w-full flex items-center justify-center"}>
+      <div
+        className={
+          "w-full lg:w-[70%] xl:w-[55%] 2xl:w-[35%] px-[1rem] md:px-[3rem] py-[2rem] flex items-center justify-between"
+        }
+      >
+        <Logo />
+        <Mode />
+      </div>
     </header>
   );
 };

@@ -1,13 +1,12 @@
-import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { useState } from "react";
-import { Header } from "~/components/molecules/Header";
 import SearchFilter from "~/components/molecules/SearchFilter";
 import Topics from "~/components/molecules/Topics";
 import { useSearchStore } from "~/stores/searchStore";
 import Blogs from "~/components/molecules/Blogs";
 import { useLoaderData } from "@remix-run/react";
 import { loader as routeLoader } from "./loader";
-import Footer from "~/components/molecules/Footer";
+import Wrapper from "~/components/atoms/Wrapper";
 
 // When you put the loader in a separate loader.ts file, Remix does not automatically recognize it as the loader for _index.tsx. Loaders are tied to specific routes, and Remix expects the loader to either:
 
@@ -33,14 +32,10 @@ export default function Index() {
   const { topics, blogs } = useLoaderData<typeof routeLoader>();
 
   return (
-    <div className="w-full min-h-screen mt-[2rem] flex flex-col items-center justify-center ">
-      <div className={"w-full lg:w-[70%] xl:w-[55%] 2xl:w-[35%] px-[1rem] md:px-[3rem]"}>
-        <Header />
-        <SearchFilter showTopics={showTopics} setShowTopics={setShowTopics} />
-        {showTopics ? <Topics topics={topics} /> : null}
-        <Blogs blogs={blogs} />
-        <Footer/>
-      </div>
-    </div>
+    <Wrapper>
+      <SearchFilter showTopics={showTopics} setShowTopics={setShowTopics} />
+      {showTopics ? <Topics topics={topics} /> : null}
+      <Blogs blogs={blogs} />
+    </Wrapper>
   );
 }

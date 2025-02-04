@@ -5,11 +5,11 @@ const prisma = new PrismaClient();
 async function seedBlogs() {
   // Check if blogs already exist
   const existingBlogs = await prisma.blog.findMany();
-  const existingTopics = await prisma.topic.findMany();  
-  const existingComments = await prisma.comment.findMany(); 
-  const existingUsers = await prisma.user.findMany(); 
+  const existingTopics = await prisma.topic.findMany();
+  const existingComments = await prisma.comment.findMany();
+  const existingUsers = await prisma.user.findMany();
 
-  if (existingBlogs.length === 0) {
+  // if (existingBlogs.length === 0) {
     // Seed topics if they don't already exist
     if (existingTopics.length === 0) {
       await prisma.topic.createManyAndReturn({
@@ -20,7 +20,7 @@ async function seedBlogs() {
         ],
         skipDuplicates: true,
       });
-    } 
+    }
 
     if (existingUsers.length === 0) {
       await prisma.user.createManyAndReturn({
@@ -32,10 +32,10 @@ async function seedBlogs() {
         ],
         skipDuplicates: true,
       });
-    } 
+    }
 
     // Seed blogs
-    const blogs = await prisma.blog.createManyAndReturn({
+    await prisma.blog.createManyAndReturn({
       data: [
         {
           title: "The Future of Artificial Intelligence",
@@ -44,7 +44,7 @@ async function seedBlogs() {
           content:
             "Artificial Intelligence (AI) has evolved at an astounding pace, infiltrating nearly every sector imaginable. From chatbots providing customer service to the use of AI in medical diagnosis, it is reshaping industries across the globe. The rise of machine learning and deep learning algorithms has unlocked new possibilities, making AI not just a tool but a partner in solving complex problems. In healthcare, AI helps doctors diagnose diseases with greater accuracy and speed, while in finance, it analyzes massive datasets to predict market trends and optimize investments. In transportation, self-driving cars are becoming a reality, challenging our traditional notions of mobility. As AI continues to improve, it will likely redefine entire industries, with applications in everything from automation to personal assistants, making it an essential part of our daily lives.",
           thumbnail: "https://example.com/ai-thumbnail.jpg",
-          topicId: 1, 
+          topicId: 1,
           likes: 25,
         },
         {
@@ -54,7 +54,7 @@ async function seedBlogs() {
           content:
             "A day in the life of a software developer can be as dynamic as the projects they work on. The morning might begin with a team meeting where developers discuss their progress and blockers. Afterward, it's time to dive into code – whether that means building new features, fixing bugs, or reviewing pull requests from colleagues. The challenge lies in not just writing code that works, but writing code that is maintainable, efficient, and scalable. Developers often juggle multiple tasks at once, from building new features to ensuring the existing code base is bug-free. Collaboration with other developers, designers, and project managers is key to making sure the product moves forward. Whether working in a fast-paced startup or a large enterprise, developers are always learning, staying updated with new technologies, and refining their skills. The day typically ends with a sense of accomplishment but also with a realization that the next day will bring new challenges to overcome.",
           thumbnail: "https://example.com/dev-life.jpg",
-          topicId: 2, 
+          topicId: 2,
           likes: 15,
         },
         {
@@ -64,7 +64,7 @@ async function seedBlogs() {
           content:
             "Failure is something that everyone experiences at some point, but it is often misunderstood. Instead of seeing failure as a setback, it should be seen as an opportunity to learn and grow. The best lessons often come from the mistakes we make along the way. Whether it's in our personal lives or professional careers, failure teaches us to persevere, adapt, and refine our approach. In business, failed ventures often provide valuable insights into what doesn’t work, allowing entrepreneurs to pivot and improve their future strategies. In life, personal failures help us develop emotional resilience, teaching us how to cope with adversity and bounce back stronger. Embracing failure as part of the journey is key to success. Each failure brings with it the potential for growth, learning, and ultimately achieving greater things than we could have imagined before.",
           thumbnail: null,
-          topicId: 3, 
+          topicId: 3,
           likes: 30,
         },
         {
@@ -121,52 +121,91 @@ async function seedBlogs() {
       skipDuplicates: true,
     });
 
-
-    // Seed comments only if they don't already exist
-    if (existingComments.length === 0) {
-      const comments = await prisma.comment.createManyAndReturn({
+    // if (existingComments.length === 0) {
+      // Create top-level comments
+      await prisma.comment.createManyAndReturn({
         data: [
           {
-            blogId: blogs[0].id,
+            blogId: 1,
             comment: "This is a fascinating article about AI!",
             likes: 10,
             userId: 1,
           },
           {
-            blogId: blogs[3].id,
+            blogId: 3,
             comment: "Thanks for sharing this advice for beginners.",
             likes: 5,
             userId: 2,
           },
-          // Additional comments for other blogs
+          {
+            blogId: 6,
+            comment: "This is my very insightful comment",
+            likes: 17,
+            userId: 3,
+          },
         ],
         skipDuplicates: true,
       });
 
-
-      // Add replies to comments only if comments exist
-      if (comments.length > 0) {
-        await prisma.reply.createManyAndReturn({
-          data: [
-            {
-              commentId: comments[0].id,
-              reply: "I agree, AI is truly fascinating!",
-              likes: 3,
-            },
-            {
-              commentId: comments[1].id,
-              reply: "Glad you found it helpful!",
-              likes: 2,
-            },
-          ],
-          skipDuplicates: true,
-        });
-
-      }
-    }
-  } else {
-    console.log("Blogs already exist in the database.");
-  }
+      // Create replies using `parentId`
+      await prisma.comment.createManyAndReturn({
+        data: [
+          {
+            blogId: 1,
+            comment: "I agree, AI is truly fascinating!",
+            likes: 3,
+            userId: 3,
+            parentId: 1,
+          },
+          {
+            blogId: 3,
+            comment: "Glad you found it helpful!",
+            likes: 2,
+            userId: 1,
+            parentId: 2,
+          },
+          {
+            blogId: 6,
+            comment: "A very insightful comment indeed",
+            likes: 9,
+            userId: 1,
+            parentId: 3
+          },
+          {
+            blogId: 6,
+            comment: "Not so insightful imo",
+            likes: 12,
+            userId: 2,
+            parentId: 6
+          },
+          {
+            blogId: 6,
+            comment: "What do you mean not insightful. Bffr!!!",
+            likes: 2,
+            userId: 1,
+            parentId: 7
+          },
+          {
+            blogId: 6,
+            comment: "Moot!! Agree to disagree",
+            likes: 6,
+            userId: 2,
+            parentId: 8
+          },
+          {
+            blogId: 6,
+            comment: "Beautiful piece Njeri",
+            likes: 3,
+            userId: 4,
+            parentId: 3
+          },
+        ],
+        skipDuplicates: true,
+      });
+    // }
+  // } else {
+  //   console.log("Blogs already exist in the database.");
+  // }
 }
 
 // Run the seed function
