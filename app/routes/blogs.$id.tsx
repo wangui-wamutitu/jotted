@@ -1,11 +1,117 @@
-import { LoaderFunction } from "@remix-run/node";
+import { LoaderFunction, ActionFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { prisma } from "~/.server/db";
 import Wrapper from "~/components/atoms/Wrapper";
-import defaultThumbnail from "../../public/defaultThumbnail.jpg";
 import { CiClock2, CiUser } from "react-icons/ci";
 import Likes from "~/components/atoms/Likes";
 import Comments from "~/components/molecules/Comments";
+
+type ActionErrors = {
+  name?: string;
+  email?: string;
+  comment?: string;
+  formError?: string;
+};
+
+export const action: ActionFunction = async ({ request, params }) => {
+  const formData = await request.formData();
+  const actionType = formData.get("actionType");
+
+  // Validate blog ID
+  const blogId = Number(params.id);
+  if (isNaN(blogId)) {
+    return { 
+      errors: { 
+        formError: "Invalid blog ID" 
+      } 
+    };
+  }
+
+  switch (actionType) {
+    case "addComment": {
+      const name = formData.get("name");
+      const email = formData.get("email");
+      const commentContent = formData.get("content");
+      const parentId = formData.get("parentId");
+      
+      const errors: ActionErrors = {};
+      
+      // Validate inputs
+      if (!name || typeof name !== "string" || name.trim() === "") {
+        errors.name = "Name is required";
+      }
+      
+      if (!email || typeof email !== "string" || !email.includes("@")) {
+        errors.email = "Valid email is required";
+      }
+      
+      if (!commentContent || typeof commentContent !== "string" || commentContent.trim() === "") {
+        errors.comment = "Comment content is required";
+      }
+      
+      // Return errors if validation fails
+      if (Object.keys(errors).length > 0) {
+        return { errors };
+      }
+
+      try {
+        // Find or create user
+        let user = await prisma.user.findUnique({
+          where: { email: email as string }
+        });
+
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              name: name as string,
+              email: email as string
+            }
+          });
+        }
+
+        // Create comment
+        const commentData: any = {
+          comment: (commentContent as string).trim(),
+          blogId: blogId,
+          userId: user.id,
+          parentId: parentId ? parentId : null
+        };
+
+        // Add parent comment if it exists and is valid
+        if (parentId && !isNaN(Number(parentId))) {
+          commentData.parentId = Number(parentId);
+        }
+
+        const newComment = await prisma.comment.create({
+          data: commentData,
+          include: {
+            user: true,
+            parent: true
+          }
+        });
+        
+        return { 
+          success: true, 
+          comment: newComment 
+        };
+      } catch (error) {
+        console.error("Comment creation error:", error);
+        return {
+          errors: {
+            formError: "Failed to create comment. Please try again."
+          }
+        };
+      }
+    }
+    
+    default:
+      return { 
+        errors: { 
+          formError: "Invalid action" 
+        } 
+      };
+  }
+};
 
 export const loader: LoaderFunction = async ({ params }) => {
   try {
@@ -41,7 +147,6 @@ export const loader: LoaderFunction = async ({ params }) => {
 
 export default function Blog() {
   const {blog,comments} = useLoaderData<typeof loader>();
-  console.log(comments);
 
   return (
     <>
@@ -49,13 +154,13 @@ export default function Blog() {
         <p className={"font-bold text-lg mb-3"}>{blog?.title}</p>
         <div className={"flex"}>
           <CiClock2 size={16} />
-          <p className="font-extralight text-xs mb-3 ml-2 text-center">
+          <p className="font-extralight text-sm mb-3 ml-2 text-center">
             {blog?.createdAt.toLocaleDateString()}
           </p>
         </div>
         <div className={"flex"}>
           <CiUser size={16} />
-          <p className="font-extralight text-xs mb-3 ml-2 text-center">
+          <p className="font-extralight text-sm mb-3 ml-2 text-center">
             Christine Wangui
           </p>
         </div>
@@ -65,9 +170,9 @@ export default function Blog() {
           alt="Thumbnail"
           className={"mb-3 w-full h-48 rounded-[16px] object-contain"}
         />
-        <p className={"text-sm"}>{blog?.content}</p>
+        <p>{blog?.content}</p>
         <section className={"w-full my-3"}>
-          <p className={"font-bold"}>Let me hear from you</p>
+          <p className={"font-bold text-lg"}>Let me hear from you</p>
           <Likes likes={blog?.likes} />
           <Comments comments={comments} />
         </section>

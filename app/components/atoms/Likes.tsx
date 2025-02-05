@@ -11,8 +11,8 @@ const Likes = ({likes}: {likes: number}) => {
     }
   return (
       <button onClick={toggleLike} className={'w-full flex items-center justify-start my-3'}>
-        {isLiked ? <BiSolidLike size={16} color={'red'}/> : <BiLike size={16}/>}
-        <span className={'font-extralight text-xs ml-2'}>{isLiked ? likes + 1 : likes} likes</span>
+        {isLiked ? <BiSolidLike size={18} color={'red'}/> : <BiLike size={18}/>}
+        <span className={'font-extralight text-sm ml-2'}>{isLiked ? likes + 1 : likes} likes</span>
     </button>
   )
 }

@@ -25,10 +25,10 @@ async function seedBlogs() {
     if (existingUsers.length === 0) {
       await prisma.user.createManyAndReturn({
         data: [
-          { name: "Mary Jane" },
-          { name: "Kisiagani Njuguna" },
-          { name: "Njeri Atieno" },
-          { name: "John Wamalwa" },
+          { name: "Mary Jane", email: 'maryjane@email.com' },
+          { name: "Kisiagani Njuguna", email: 'kisiagani_nju@email.com' },
+          { name: "Njeri Atieno", email: 'njeriatieno@email.com' },
+          { name: "John Wamalwa", email: 'wamalwajohn@email.com' },
         ],
         skipDuplicates: true,
       });

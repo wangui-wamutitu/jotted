@@ -6,7 +6,7 @@ const Comments = ({comments}: {comments: TComment[]}) => {
 
   return (
     <div className={'w-full'}>
-        <p className={'my-2 font-extralight text-xs'}>{comments?.length === 1 ? '1 comment' : `${comments?.length} comments`}</p>
+        <p className={'my-2 font-extralight text-sm'}>{comments?.length === 1 ? '1 comment' : `${comments?.length} comments`}</p>
         <WriteCommentForm />
         {comments?.map(comment => <Comment comment={comment}/>)}
     </div>

@@ -4,7 +4,7 @@ import Likes from "./Likes";
 
 const Comment = ({ comment }: { comment: TComment }) => {
   return (
-    <div className={"text-sm"}>
+    <div className={'text-sm'}>
       <div className="w-full mb-2 flex justify-between items-center">
         <div className={"flex items-center"}>
           <div
@@ -21,7 +21,7 @@ const Comment = ({ comment }: { comment: TComment }) => {
       <p>{comment?.comment}</p>
       <div className={"flex justify-between items-center mb-2"}>
         <Likes likes={comment?.likes} />
-        <button className={"text-xs font-extralight"}>Reply</button>
+        <button className={"text-sm font-extralight"}>Reply</button>
       </div>
       <div className={"pl-4 border-l border-l-dark_pink"}>
         {comment?.replies

@@ -19,9 +19,11 @@ model Blog {
   likes     Int       @default(0)
   topic     Topic     @relation(fields: [topicId], references: [id])
   comments  Comment[]
+  deletedAt DateTime?  // Allows soft deletion
 
   @@index([topicId])  // Index for faster filtering by topic
   @@index([likes])    // Todo: Index for sorting by likes 
+  @@index([createdAt(sort: Desc)])  // Quick sorting of recent blogs
 }
 
 model Topic {
@@ -39,15 +41,20 @@ model Comment {
   parentId  Int?      // Nullable, indicates if this comment is a reply to another comment
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt @default(now())
+  deletedAt DateTime?  // Allows soft deletion
 
   blog      Blog      @relation(fields: [blogId], references: [id])
   user      User      @relation(fields: [userId], references: [id])
   parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies   Comment[] @relation("CommentReplies")
+  
+  @@index([blogId, createdAt])  // Useful for retrieving recent comments
+  @@index([parentId])  // Helps with nested comments
 }
 
 model User {
   id       Int       @id @default(autoincrement())
   name     String
+  email    String    @unique  // Add unique email
   comments Comment[] // Updated to match naming conventions (plural)
 }

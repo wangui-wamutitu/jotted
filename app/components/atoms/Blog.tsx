@@ -16,7 +16,7 @@ const BlogSection = ({ blog }: { blog: IBlog }) => {
       </div>
       <p>{blog?.excerpt}</p>
 
-      <p className={"my-4 px-2 py-1 border border-dark_pink text-center"}>
+      <p className={"my-4 px-2 py-1 border border-dark_pink text-center rounded-md"}>
         {blog?.topicName}
       </p>
     </section>
