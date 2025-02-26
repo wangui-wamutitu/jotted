@@ -1,7 +1,8 @@
 import Logo from "../atoms/Logo";
 import Mode from "../atoms/Mode";
+import UserProfile from "../atoms/UserProfile";
 
-export const Header = () => {
+export const Header = ({username}: {username: string}) => {
   return (
     <header className={"w-full flex items-center justify-center"}>
       <div
@@ -10,6 +11,7 @@ export const Header = () => {
         }
       >
         <Logo />
+        <UserProfile username={username}/>
         <Mode />
       </div>
     </header>

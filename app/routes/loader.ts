@@ -1,8 +1,18 @@
 import { LoaderFunction } from "@remix-run/node";
 import { prisma } from "~/.server/db";
+import { getSession, getUserSession } from "~/common/session.server";
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({request}) => {
   try {
+    const session = await getUserSession(request);
+    let userName = null;
+    if (session?.userId) {
+      userName = await prisma.user.findUnique({
+        where: { id: session.userId },
+        select: { name: true },
+      });
+    }
+
     const topics = await prisma.topic.findMany();
     const blogs = await prisma.blog.findMany();
 
@@ -16,6 +26,9 @@ export const loader: LoaderFunction = async () => {
     );
 
     return {
+      userId: session.userId,
+      role: session.role,
+      username: userName,
       topics: topics || [],
       blogs: blogsWithTopicNames || [],
     };

@@ -11,7 +11,7 @@ model Blog {
   id        Int       @id @default(autoincrement())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  title     String    @db.VarChar(255) 
+  title     String    @db.VarChar(255)
   excerpt   String
   content   String    @unique
   thumbnail String?
@@ -19,42 +19,45 @@ model Blog {
   likes     Int       @default(0)
   topic     Topic     @relation(fields: [topicId], references: [id])
   comments  Comment[]
-  deletedAt DateTime?  // Allows soft deletion
+  deletedAt DateTime? // Allows soft deletion
 
-  @@index([topicId])  // Index for faster filtering by topic
-  @@index([likes])    // Todo: Index for sorting by likes 
-  @@index([createdAt(sort: Desc)])  // Quick sorting of recent blogs
+  @@index([topicId]) // Index for faster filtering by topic
+  @@index([likes]) // Todo: Index for sorting by likes 
+  @@index([createdAt(sort: Desc)]) // Quick sorting of recent blogs
 }
 
 model Topic {
   id    Int    @id @default(autoincrement())
-  name  String @unique 
+  name  String @unique
   blogs Blog[]
 }
 
 model Comment {
   id        Int       @id @default(autoincrement())
-  blogId    Int       // Foreign key to Blog
+  blogId    Int // Foreign key to Blog
   comment   String
-  likes     Int       @default(0)  // Default value for likes
-  userId    Int       // Foreign key to User
-  parentId  Int?      // Nullable, indicates if this comment is a reply to another comment
+  likes     Int       @default(0) // Default value for likes
+  userId    Int // Foreign key to User
+  parentId  Int? // Nullable, indicates if this comment is a reply to another comment
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt @default(now())
-  deletedAt DateTime?  // Allows soft deletion
+  updatedAt DateTime  @default(now()) @updatedAt
+  deletedAt DateTime? // Allows soft deletion
 
-  blog      Blog      @relation(fields: [blogId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
-  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
-  replies   Comment[] @relation("CommentReplies")
-  
-  @@index([blogId, createdAt])  // Useful for retrieving recent comments
-  @@index([parentId])  // Helps with nested comments
+  blog    Blog      @relation(fields: [blogId], references: [id])
+  user    User      @relation(fields: [userId], references: [id])
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([blogId, createdAt]) // Useful for retrieving recent comments
+  @@index([parentId]) // Helps with nested comments
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  name     String
-  email    String    @unique  // Add unique email
-  comments Comment[] // Updated to match naming conventions (plural)
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  comments  Comment[]
+  role      String    @default("USER") // Default role is "USER", can be "WRITER"
 }

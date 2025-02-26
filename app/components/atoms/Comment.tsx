@@ -1,8 +1,11 @@
 import { TComment } from "globals";
 import { getInitials, getTimeAgo } from "~/util";
 import Likes from "./Likes";
+import { useUserStore } from "~/stores/userDetailsStore";
 
 const Comment = ({ comment }: { comment: TComment }) => {
+  const username = useUserStore((state) => state.username);
+
   return (
     <div className={'text-sm'}>
       <div className="w-full mb-2 flex justify-between items-center">
@@ -21,7 +24,7 @@ const Comment = ({ comment }: { comment: TComment }) => {
       <p>{comment?.comment}</p>
       <div className={"flex justify-between items-center mb-2"}>
         <Likes likes={comment?.likes} />
-        <button className={"text-sm font-extralight"}>Reply</button>
+        {username ? <button className={"text-sm font-extralight"}>Reply</button> : null}
       </div>
       <div className={"pl-4 border-l border-l-dark_pink"}>
         {comment?.replies

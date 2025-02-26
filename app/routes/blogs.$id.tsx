@@ -1,10 +1,12 @@
 import { LoaderFunction, ActionFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { prisma } from "~/.server/db";
 import Wrapper from "~/components/atoms/Wrapper";
 import { CiClock2, CiUser } from "react-icons/ci";
 import Likes from "~/components/atoms/Likes";
 import Comments from "~/components/molecules/Comments";
+import { getUserSession } from "~/common/session.server";
+import { useUserStore } from "~/stores/userDetailsStore";
 
 type ActionErrors = {
   name?: string;
@@ -20,10 +22,10 @@ export const action: ActionFunction = async ({ request, params }) => {
   // Validate blog ID
   const blogId = Number(params.id);
   if (isNaN(blogId)) {
-    return { 
-      errors: { 
-        formError: "Invalid blog ID" 
-      } 
+    return {
+      errors: {
+        formError: "Invalid blog ID",
+      },
     };
   }
 
@@ -33,22 +35,26 @@ export const action: ActionFunction = async ({ request, params }) => {
       const email = formData.get("email");
       const commentContent = formData.get("content");
       const parentId = formData.get("parentId");
-      
+
       const errors: ActionErrors = {};
-      
+
       // Validate inputs
       if (!name || typeof name !== "string" || name.trim() === "") {
         errors.name = "Name is required";
       }
-      
+
       if (!email || typeof email !== "string" || !email.includes("@")) {
         errors.email = "Valid email is required";
       }
-      
-      if (!commentContent || typeof commentContent !== "string" || commentContent.trim() === "") {
+
+      if (
+        !commentContent ||
+        typeof commentContent !== "string" ||
+        commentContent.trim() === ""
+      ) {
         errors.comment = "Comment content is required";
       }
-      
+
       // Return errors if validation fails
       if (Object.keys(errors).length > 0) {
         return { errors };
@@ -57,15 +63,15 @@ export const action: ActionFunction = async ({ request, params }) => {
       try {
         // Find or create user
         let user = await prisma.user.findUnique({
-          where: { email: email as string }
+          where: { email: email as string },
         });
 
         if (!user) {
           user = await prisma.user.create({
             data: {
               name: name as string,
-              email: email as string
-            }
+              email: email as string,
+            },
           });
         }
 
@@ -74,7 +80,7 @@ export const action: ActionFunction = async ({ request, params }) => {
           comment: (commentContent as string).trim(),
           blogId: blogId,
           userId: user.id,
-          parentId: parentId ? parentId : null
+          parentId: parentId ? parentId : null,
         };
 
         // Add parent comment if it exists and is valid
@@ -86,29 +92,29 @@ export const action: ActionFunction = async ({ request, params }) => {
           data: commentData,
           include: {
             user: true,
-            parent: true
-          }
+            parent: true,
+          },
         });
-        
-        return { 
-          success: true, 
-          comment: newComment 
+
+        return {
+          success: true,
+          comment: newComment,
         };
       } catch (error) {
         console.error("Comment creation error:", error);
         return {
           errors: {
-            formError: "Failed to create comment. Please try again."
-          }
+            formError: "Failed to create comment. Please try again.",
+          },
         };
       }
     }
-    
+
     default:
-      return { 
-        errors: { 
-          formError: "Invalid action" 
-        } 
+      return {
+        errors: {
+          formError: "Invalid action",
+        },
       };
   }
 };
@@ -135,9 +141,8 @@ export const loader: LoaderFunction = async ({ params }) => {
       },
       orderBy: { id: "asc" },
     });
-    
 
-    return {blog, comments};
+    return { blog, comments };
   } catch (error) {
     throw new Response(`Error in fetching this blog of id: ${params.id}`, {
       status: 500,
@@ -146,11 +151,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 export default function Blog() {
-  const {blog,comments} = useLoaderData<typeof loader>();
+  const { blog, comments } = useLoaderData<typeof loader>();
+  const username = useUserStore((state) => state.username);
 
   return (
     <>
-      <Wrapper>
+      <Wrapper username={username ?? ""}>
         <p className={"font-bold text-lg mb-3"}>{blog?.title}</p>
         <div className={"flex"}>
           <CiClock2 size={16} />
@@ -166,14 +172,21 @@ export default function Blog() {
         </div>
         {/* ToDo: display image thumbnail from backend */}
         <img
-          src={'/defaultThumbnail.jpg'}
+          src={"/defaultThumbnail.jpg"}
           alt="Thumbnail"
           className={"mb-3 w-full h-48 rounded-[16px] object-contain"}
         />
         <p>{blog?.content}</p>
         <section className={"w-full my-3"}>
-          <p className={"font-bold text-lg"}>Let me hear from you</p>
           <Likes likes={blog?.likes} />
+          <p className={"font-bold text-lg"}>
+            Let me hear from you{" "}
+            {username ? null : (
+              <Link to="/login" className={"ml-2 text-sm italic text-dark_pink hover:border-b hover:border-b-dark_pink"}>
+                (Login to comment{" "})
+              </Link>
+            )}
+          </p>
           <Comments comments={comments} />
         </section>
       </Wrapper>
