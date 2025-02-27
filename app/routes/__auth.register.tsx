@@ -50,7 +50,7 @@ export async function action({ request }: ActionFunctionArgs) {
   //create session for the new user to automatically be logged in
   const session = await getSession(request.headers.get("Cookie"));
   session?.set("userId", user.id);
-  user.email !== "admin@email.com" ? session?.set("role", "USER") : session?.set("role", "WRITER");
+  user.email === "admin@email.com" ? session?.set("role", "WRITER") : session?.set("role", "USER");
 
   return redirect("/", {
     headers: {

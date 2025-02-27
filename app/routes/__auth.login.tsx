@@ -25,14 +25,21 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const existingUser = await prisma.user.findUnique({
     where: { email: results.data.email },
+    select: { id: true, name: true, email: true, password: true, role:true },
   });
+
+  const userWithPassword = await prisma.$queryRaw<
+    { password: string }[]
+  >`SELECT password FROM "User" WHERE email = ${results.data.email}`;
+
   if (!existingUser) {
     return validationError({
       fieldErrors: { email: "This email does not exist. Fix it or register first" },
     });
   }
 
-  if (!(await compare(results.data.password, existingUser.password))) {
+  const storedPassword = userWithPassword[0].password;
+  if (!(await compare(results.data.password, storedPassword))) {
     return validationError({
       fieldErrors: { password: "Invalid password. Try again." },
     });

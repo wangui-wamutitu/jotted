@@ -1,13 +1,17 @@
-import {create} from "zustand";
+import { create } from "zustand";
 
-interface UserStore {
-  username: string | null
-//   userId?: number
-//   role?: 'USER' | 'WRITER'
-  setUsername: (username: string | null) => void;
+interface UserState {
+  user: {
+    username: string | null;
+    userId: number | null;
+    role: "USER" | "WRITER";
+  } | null;
+  setUser: (user: UserState["user"]) => void;
+  resetUser: () => void
 }
 
-export const useUserStore = create<UserStore>((set) => ({
-    username: null,
-    setUsername: (name:string | null) => set((state) => ({ username: name })),
+export const useUserStore = create<UserState>((set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+  resetUser: () => set({ user: null }),
 }));

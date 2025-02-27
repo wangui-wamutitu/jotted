@@ -2,10 +2,10 @@ import { ReactNode } from "react";
 import Footer from "../molecules/Footer";
 import { Header } from "../molecules/Header";
 
-const Wrapper = ({username, children }: {username?: string, children: ReactNode }) => {
+const Wrapper = ({ children }: { children: ReactNode }) => {
   return (
     <div className={'min-h-screen flex flex-col justify-between'}>
-      <Header username={username ?? ""}/>
+      <Header />
 
       <div className="w-full flex flex-col items-center justify-center">
         <div

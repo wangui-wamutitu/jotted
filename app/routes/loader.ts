@@ -1,6 +1,6 @@
 import { LoaderFunction } from "@remix-run/node";
 import { prisma } from "~/.server/db";
-import { getSession, getUserSession } from "~/common/session.server";
+import { getUserSession } from "~/common/session.server";
 
 export const loader: LoaderFunction = async ({request}) => {
   try {

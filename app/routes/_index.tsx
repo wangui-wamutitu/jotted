@@ -28,17 +28,24 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  const { topics, blogs, username } = useLoaderData<typeof routeLoader>();
+  const { topics, blogs, username, role, userId } = useLoaderData<typeof routeLoader>();
   const [showTopics, setShowTopics] = useState(false);
   const searchText = useSearchStore((state) => state.searchText);
-  const setUsername = useUserStore((state) => state.setUsername);
+  const setUser = useUserStore((state) => state.setUser);
 
   useEffect(() => {
-    setUsername(username?.name)
-  }, [username])
+    if(userId && role && username){
+      const user = {
+        username: username?.name, role, userId
+      }
+      setUser({...user})
+    }else{
+      setUser(null)
+    }
+  }, [username, role, userId])
 
   return (
-    <Wrapper username={username?.name}>
+    <Wrapper>
       <SearchFilter showTopics={showTopics} setShowTopics={setShowTopics} />
       {showTopics ? <Topics topics={topics} /> : null}
       <Blogs blogs={blogs} />

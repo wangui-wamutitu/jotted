@@ -1,10 +1,9 @@
-import { ActionFunctionArgs, LoaderFunction, redirect } from "@remix-run/node";
-import { Form, Link, useLoaderData } from "@remix-run/react";
-import { prisma } from "~/.server/db";
+import { ActionFunctionArgs, redirect } from "@remix-run/node";
+import { Form, Link, useNavigation } from "@remix-run/react";
+import { useEffect } from "react";
 import {
   destroySession,
   getSession,
-  getUserSession,
 } from "~/common/session.server";
 import Wrapper from "~/components/atoms/Wrapper";
 import { useUserStore } from "~/stores/userDetailsStore";
@@ -20,10 +19,20 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 
 export default function Logout() {
-  const username = useUserStore((state) => state.username);
+  const resetUser = useUserStore((state) => state.resetUser);
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    // When navigation state changes to "idle", it means redirect happened
+    if (navigation.state === "submitting") {
+      resetUser();
+    }
+  }, [navigation.state, resetUser]);
+
 
   return (
-    <Wrapper username={username ?? ''}>
+    <Wrapper>
       <div
         className={"w-full h-full flex flex-col items-center justify-center"}
       >

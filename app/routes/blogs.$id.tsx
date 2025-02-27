@@ -5,7 +5,6 @@ import Wrapper from "~/components/atoms/Wrapper";
 import { CiClock2, CiUser } from "react-icons/ci";
 import Likes from "~/components/atoms/Likes";
 import Comments from "~/components/molecules/Comments";
-import { getUserSession } from "~/common/session.server";
 import { useUserStore } from "~/stores/userDetailsStore";
 
 type ActionErrors = {
@@ -152,11 +151,11 @@ export const loader: LoaderFunction = async ({ params }) => {
 
 export default function Blog() {
   const { blog, comments } = useLoaderData<typeof loader>();
-  const username = useUserStore((state) => state.username);
+  const user = useUserStore((state) => state.user);
 
   return (
     <>
-      <Wrapper username={username ?? ""}>
+      <Wrapper>
         <p className={"font-bold text-lg mb-3"}>{blog?.title}</p>
         <div className={"flex"}>
           <CiClock2 size={16} />
@@ -181,7 +180,7 @@ export default function Blog() {
           <Likes likes={blog?.likes} />
           <p className={"font-bold text-lg"}>
             Let me hear from you{" "}
-            {username ? null : (
+            {user?.username ? null : (
               <Link to="/login" className={"ml-2 text-sm italic text-dark_pink hover:border-b hover:border-b-dark_pink"}>
                 (Login to comment{" "})
               </Link>

@@ -23,3 +23,8 @@ export const Roles = {
 } as const;
 
 export type Role = keyof typeof Roles;
+
+export type TSidebarItem = {
+  itemId: number,
+  item: string
+}
